@@ -16,18 +16,17 @@ module ROTP
     # :nocov:
 
     def errors
-      return unless needs_secret?
+      if requires_secret? && blank_secret?
+        return red 'You must also specify a --secret. Try --help for help.'
+      end
 
-      if blank_secret?
-        red 'You must also specify a --secret. Try --help for help.'
-      elsif invalid_secret?
-        red 'Secret must be in RFC4648 Base32 format - http://en.wikipedia.org/wiki/Base32#RFC_4648_Base32_alphabet'
+      if secret_provided? && invalid_secret?
+        return red 'Secret must be in RFC4648 Base32 format - http://en.wikipedia.org/wiki/Base32#RFC_4648_Base32_alphabet'
       end
     end
 
     def output
-      return help_message if options.mode == :help
-      options.warnings || errors || otp_value
+      options.warnings || errors || (help_message if options.mode == :help) || otp_value
     end
 
     def arguments
@@ -57,8 +56,12 @@ module ROTP
       end
     end
 
-    def needs_secret?
+    def requires_secret?
       %i[time hmac].include?(options.mode)
+    end
+
+    def secret_provided?
+      !options.secret.to_s.empty?
     end
 
     def blank_secret?
