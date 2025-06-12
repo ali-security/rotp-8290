@@ -26,7 +26,7 @@ module ROTP
     end
 
     def output
-      options.warnings || errors || (help_message if options.mode == :help) || otp_value
+      errors || options.warnings || (help_message if options.mode == :help) || otp_value
     end
 
     def arguments
