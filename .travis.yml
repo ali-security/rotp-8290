@@ -7,3 +7,4 @@ rvm:
   - 1.9.3
 script:
   - bundler exec rspec
+dist: precise
